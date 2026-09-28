@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bangladesh Hazard Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand:#F6F1E7;
+    --sand-deep:#EDE4D2;
+    --ink:#1E2A22;
+    --ink-soft:#5B6459;
+    --river:#234E52;
+    --river-soft:#3C6B6E;
+    --high:#B23A2E;
+    --high-bg:#F4E2DE;
+    --med:#C4841F;
+    --med-bg:#F3E6CC;
+    --low:#4C7A6B;
+    --low-bg:#DEE9E2;
+    --vlow:#98A28E;
+    --vlow-bg:#E7E7DE;
+    --line:#D9CFB9;
+    --card:#FCFAF4;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--sand);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:40px 28px 80px;
+  }
+  /* ---- header ---- */
+  header.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    border-bottom:1.5px solid var(--ink);
+    padding-bottom:22px;
+    margin-bottom:6px;
+    flex-wrap:wrap;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--river);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(34px,5vw,54px);
+    line-height:1.02;
+    margin:0;
+    letter-spacing:-.01em;
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--river);
+  }
+  .top-meta{
+    text-align:right;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.7;
+    min-width:210px;
+  }
+  .top-meta b{color:var(--ink);font-weight:500;}
+  .lede{
+    font-size:15.5px;
+    color:var(--ink-soft);
+    max-width:640px;
+    margin:16px 0 34px;
+    line-height:1.55;
+  }
+  /* ---- layout ---- */
+  .layout{
+    display:grid;
+    grid-template-columns:270px 1fr;
+    gap:0;
+    border-top:1px solid var(--line);
+  }
+  @media (max-width:820px){
+    .layout{grid-template-columns:1fr;}
+  }
+  /* ---- nav rail ---- */
+  nav.rail{
+    border-right:1px solid var(--line);
+    padding:22px 20px 22px 0;
+    position:relative;
+  }
+  .rail-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+  }
+  .river-svg{
+    position:absolute;
+    left:8px;
+    top:52px;
+    bottom:22px;
+    width:14px;
+  }
+  ul.divisions{
+    list-style:none;
+    margin:0;padding:0;
+    position:relative;
+    padding-left:26px;
+  }
+  ul.divisions li{
+    margin-bottom:2px;
+  }
+  ul.divisions button{
+    all:unset;
+    display:block;
+    cursor:pointer;
+    width:100%;
+    padding:11px 10px 11px 14px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14.5px;
+    font-weight:500;
+    color:var(--ink-soft);
+    border-left:2px solid transparent;
+    transition:all .15s ease;
+    position:relative;
+  }
+  ul.divisions button .region{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:400;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    opacity:.7;
+    margin-top:2px;
+    letter-spacing:.02em;
+  }
+  ul.divisions button:hover{
+    color:var(--ink);
+    background:var(--sand-deep);
+  }
+  ul.divisions li.active button{
+    color:var(--ink);
+    border-left:2px solid var(--high);
+    background:var(--card);
+    box-shadow:inset 0 0 0 1px var(--line);
+  }
+  .dot{
+    display:inline-block;
+    width:7px;height:7px;
+    border-radius:50%;
+    margin-right:8px;
+    position:relative;
+    top:-1px;
+  }
+  /* ---- main panel ---- */
+  main.panel{
+    padding:24px 0 24px 34px;
+  }
+  @media (max-width:820px){
+    main.panel{padding:24px 0 0;}
+  }
+  .division-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+  .division-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:30px;
+    margin:0 0 4px;
+  }
+  .division-head .tagline{
+    color:var(--ink-soft);
+    font-size:14px;
+    max-width:480px;
+    line-height:1.5;
+  }
+  .summary-badge{
+    font-family:'IBM Plex Mono',monospace;
+    text-align:right;
+    border:1px solid var(--ink);
+    padding:10px 16px;
+    min-width:150px;
+  }
+  .summary-badge .num{
+    font-size:26px;
+    font-weight:500;
+    color:var(--high);
+    line-height:1;
+  }
+  .summary-badge .cap{
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  /* ---- hazard grid ---- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  @media (max-width:680px){
+    .grid{grid-template-columns:1fr;}
+  }
+  .hcard{
+    background:var(--card);
+    padding:18px 18px 16px;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .hcard:hover{background:var(--sand-deep);}
+  .hcard.open{background:#fff;}
+  .hcard-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:10px;
+  }
+  .hazard-name{
+    font-weight:600;
+    font-size:14.5px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .hazard-name svg{width:17px;height:17px;flex:none;color:var(--river);}
+  .level-tag{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:3px 7px;
+    border-radius:var(--radius);
+    white-space:nowrap;
+  }
+  .hcard .desc{
+    font-size:12.8px;
+    color:var(--ink-soft);
+    line-height:1.5;
+    margin-bottom:10px;
+  }
+  .hcard .advice{
+    font-size:12.8px;
+    line-height:1.55;
+    border-top:1px dashed var(--line);
+    padding-top:10px;
+    display:none;
+  }
+  .hcard.open .advice{display:block;}
+  .advice .lab{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--river);
+    display:block;
+    margin-bottom:5px;
+  }
+  .toggle-hint{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--ink-soft);
+    opacity:.6;
+    margin-top:2px;
+  }
+  /* ---- legend ---- */
+  .legend{
+    margin-top:30px;
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    align-items:center;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+  .legend-item{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+  .legend-item .sw{
+    width:10px;height:10px;
+    border-radius:2px;
+  }
+  footer.note{
+    margin-top:36px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    max-width:760px;
+    border-top:1px solid var(--line);
+    padding-top:16px;
+  }
+  /* ---- report trigger ---- */
+  .report-btn{
+    all:unset;
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--sand);
+    background:var(--ink);
+    padding:9px 14px;
+    border:1px solid var(--ink);
+    transition:background .15s ease, color .15s ease;
+    white-space:nowrap;
+  }
+  .report-btn:hover{background:var(--river);border-color:var(--river);}
+  .badge-row{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+  /* ---- report modal ---- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(30,42,34,.55);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:36px 16px;
+    overflow-y:auto;
+    z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-actions{
+    position:sticky;
+    top:0;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    max-width:760px;
+    width:100%;
+    margin:0 auto 12px;
+  }
+  .modal-actions button{
+    all:unset;
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:9px 14px;
+    border:1px solid var(--sand);
+    color:var(--sand);
+  }
+  .modal-actions button:hover{background:rgba(246,241,231,.15);}
+  .modal-actions button.primary{background:var(--sand);color:var(--ink);}
+  .modal-actions button.primary:hover{background:#fff;}
+  /* ---- printable report document ---- */
+  #reportDoc{
+    background:var(--card);
+    max-width:760px;
+    width:100%;
+    margin:0 auto;
+    padding:52px 56px 44px;
+    box-shadow:0 8px 40px rgba(0,0,0,.25);
+  }
+  .rep-mast{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:14px;
+    margin-bottom:22px;
+  }
+  .rep-mast .eyebrow{margin-bottom:6px;}
+  .rep-mast h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:26px;
+    margin:0;
+  }
+  .rep-mast .meta{
+    text-align:right;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+  .rep-section-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--river);
+    margin:24px 0 10px;
+  }
+  .rep-intro{font-size:13.5px;color:var(--ink-soft);line-height:1.6;}
+  .rep-stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-top:8px;
+  }
+  .rep-stats div{
+    background:var(--card);
+    padding:12px 10px;
+    text-align:center;
+  }
+  .rep-stats .n{font-family:'Fraunces',serif;font-size:22px;font-weight:600;}
+  .rep-stats .l{font-family:'IBM Plex Mono',monospace;font-size:9.5px;text-transform:uppercase;color:var(--ink-soft);margin-top:2px;}
+  table.rep-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+    margin-top:6px;
+  }
+  table.rep-table th{
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--ink);
+    padding:6px 8px;
+  }
+  table.rep-table td{
+    padding:9px 8px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+    line-height:1.5;
+  }
+  table.rep-table td.lvl{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    white-space:nowrap;
+    font-weight:500;
+  }
+  .rep-foot{
+    margin-top:26px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-size:10.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+  /* ---- map & district drill-down ---- */
+  .map-section{
+    margin-top:26px;
+    border-top:1px solid var(--line);
+    padding-top:20px;
+  }
+  .map-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+  }
+  .back-link{
+    all:unset;
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--river);
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+  #mapWrap{
+    background:var(--card);
+    border:1px solid var(--line);
+  }
+  #mapWrap svg{display:block;width:100%;height:auto;}
+  .dist-dot{
+    cursor:pointer;
+    transition:r .12s ease, opacity .12s ease;
+  }
+  .dist-dot:hover{opacity:1 !important;}
+  .district-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:12px;
+  }
+  .district-chips button{
+    all:unset;
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    padding:5px 10px;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink-soft);
+  }
+  .district-chips button:hover{border-color:var(--river);color:var(--ink);}
+  .district-chips button.active{
+    background:var(--ink);
+    color:var(--sand);
+    border-color:var(--ink);
+  }
+  .upazila-section{
+    margin-top:22px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+  .upazila-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:10px;
+    max-height:150px;
+    overflow-y:auto;
+    padding-right:4px;
+  }
+  .upazila-chips span{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    padding:6px 10px;
+    background:var(--sand-deep);
+    color:var(--ink);
+    border:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    line-height:1.4;
+  }
+  .upazila-chips span em{
+    font-style:normal;
+    font-size:9px;
+    color:var(--river);
+    letter-spacing:.01em;
+  }
+  @media print{
+    body *{visibility:hidden;}
+    #reportDoc, #reportDoc *{visibility:visible;}
+    #reportDoc{
+      position:absolute;left:0;top:0;
+      box-shadow:none;
+      max-width:100%;
+      padding:24px 36px;
+    }
+    .modal-actions{display:none;}
+  }
+  /* ---- copyright ---- */
+  .copyright{
+    margin-top:14px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    opacity:.8;
+  }
+  /* ---- email registration gate ---- */
+  .wrap{display:none;}
+  .wrap.unlocked{display:block;}
+  #gateOverlay{
+    position:fixed;inset:0;
+    background:var(--sand);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:200;
+    padding:24px;
+  }
+  #gateOverlay.hidden{display:none;}
+  .gate-card{
+    max-width:420px;
+    width:100%;
+    border:1.5px solid var(--ink);
+    background:var(--card);
+    padding:38px 34px 30px;
+  }
+  .gate-card .eyebrow{margin-bottom:10px;}
+  .gate-card h2{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:26px;
+    margin:0 0 10px;
+    line-height:1.1;
+  }
+  .gate-card p{
+    font-size:13px;
+    color:var(--ink-soft);
+    line-height:1.55;
+    margin:0 0 20px;
+  }
+  .gate-form{display:flex;flex-direction:column;gap:10px;}
+  .gate-form input{
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14px;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    background:var(--sand);
+    color:var(--ink);
+    outline:none;
+  }
+  .gate-form input:focus{border-color:var(--river);}
+  .gate-form button{
+    all:unset;
+    cursor:pointer;
+    text-align:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:var(--sand);
+    padding:12px;
+    transition:background .15s ease;
+  }
+  .gate-form button:hover{background:var(--river);}
+  .gate-error{
+    font-size:11.5px;
+    color:var(--high);
+    display:none;
+  }
+  .gate-note{
+    margin-top:18px;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    border-top:1px solid var(--line);
+    padding-top:12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="gateOverlay">
+  <div class="gate-card">
+    <div class="eyebrow">Geohazard Briefing · Delta Nation</div>
+    <h2>Access the Hazard Atlas</h2>
+    <p>Register with your email to open the atlas — division, district, and upazila hazard briefings for Bangladesh.</p>
+    <form class="gate-form" id="gateForm">
+      <input type="email" id="gateEmail" placeholder="you@example.com" required>
+      <div class="gate-error" id="gateError">Enter a valid email address.</div>
+      <button type="submit">Enter the atlas ↗</button>
+    </form>
+    <div class="gate-note">
+      This is a client-side demo gate — it checks the email format and unlocks the page in your browser only.
+      It does not save, verify, or send your email anywhere; refreshing the page will ask again.
+      Wiring this up to real signup storage (a form service or your own backend) is a separate step — ask if you'd like help setting that up.
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="appWrap">
+
+  <header class="top">
+    <div>
+      <div class="eyebrow">Geohazard Briefing · Delta Nation</div>
+      <h1>Bangladesh <em>Hazard Atlas</em></h1>
+    </div>
+    <div class="top-meta">
+      <div><b>8</b> divisions modeled</div>
+      <div><b>9</b> hazard categories</div>
+      <div><a href="subscription.html" style="color:var(--river);">Upgrade to Pro ↗</a></div>
+    </div>
+  </header>
+
+  <p class="lede">Select a division to see how natural hazards stack up there — from monsoon river floods to Bay of Bengal cyclones — with a plain-language note on what each level means for planning. Click a hazard card to open its guidance.</p>
+
+  <div class="layout">
+    <nav class="rail">
+      <div class="rail-label">Divisions</div>
+      <svg class="river-svg" viewBox="0 0 14 480" preserveAspectRatio="none">
+        <path d="M7,0 C2,60 12,120 6,180 C1,240 11,300 5,360 C1,410 9,440 6,480"
+              stroke="#3C6B6E" stroke-width="1.4" fill="none" opacity="0.35"/>
+      </svg>
+      <ul class="divisions" id="divisionList"></ul>
+    </nav>
+
+    <main class="panel">
+      <div class="division-head">
+        <div>
+          <h2 id="divName"></h2>
+          <div class="tagline" id="divTagline"></div>
+        </div>
+        <div class="badge-row">
+          <div class="summary-badge">
+            <div class="num" id="highCount"></div>
+            <div class="cap">of 9 hazards<br>rated high</div>
+          </div>
+          <button class="report-btn" id="reportTrigger">Generate report ↗</button>
+        </div>
+      </div>
+
+      <div class="grid" id="hazardGrid"></div>
+
+      <div class="map-section" id="mapSection">
+        <div class="map-head">
+          <div class="rail-label" style="margin:0;" id="mapLabel">Districts</div>
+          <button class="back-link" id="backToDivision" style="display:none;">← Back to division overview</button>
+        </div>
+        <div id="mapWrap"></div>
+        <div class="district-chips" id="districtChips"></div>
+      </div>
+
+      <div class="upazila-section" id="upazilaSection" style="display:none;">
+        <div class="rail-label" id="upazilaLabel">Upazilas</div>
+        <div class="upazila-chips" id="upazilaChips"></div>
+      </div>
+
+      <div class="legend" id="legend"></div>
+    </main>
+  </div>
+
+  <footer class="note">
+    Illustrative model built to demonstrate a hazard-briefing tool for Bangladesh, in the spirit of GFDRR's ThinkHazard. Levels and guidance reflect general, well-documented geographic patterns (coastal cyclone exposure, Barind-tract drought, Sylhet haor flash floods, Padma/Teesta riverbank erosion, and so on), not an official or measured dataset — treat it as a starting structure, not a substitute for authoritative hazard data. Division, district, and upazila names, and administration lines, are drawn from public Bangladesh administrative records.
+    <div class="copyright">© <span id="copyYear"></span> [Your Name] · Bangladesh Hazard Atlas. All rights reserved.</div>
+  </footer>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div style="width:100%;">
+    <div class="modal-actions">
+      <button id="btnClose">Close</button>
+      <button id="btnPrint">Print / Save as PDF</button>
+      <button class="primary" id="btnDownload">Download PDF</button>
+    </div>
+    <div id="reportDoc"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+const LEVELS = {
+  H:  { label:'High',      color:'var(--high)', bg:'var(--high-bg)' },
+  M:  { label:'Medium',    color:'var(--med)',  bg:'var(--med-bg)'  },
+  L:  { label:'Low',       color:'var(--low)',  bg:'var(--low-bg)'  },
+  VL: { label:'Very low',  color:'var(--vlow)', bg:'var(--vlow-bg)' },
+};
+const ORDER = ['H','M','L','VL'];
+
+const ICONS = {
+  river_flood: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 13c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 18c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg>`,
+  flash_flood: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>`,
+  coastal_flood: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 17c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M3 12c1.5-1.5 3-1.5 4.5 0s3 1.5 4.5 0 3-1.5 4.5 0 3 1.5 4.5 0"/><path d="M12 3v6"/><path d="M9 6l3-3 3 3"/></svg>`,
+  cyclone: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8c0-3 3-5 6-5s5 2 5 4-2 3-4 3-3-1-3-2.5 1-2 2-2"/><circle cx="12" cy="12" r="9"/></svg>`,
+  earthquake: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 15l3-4 3 6 3-9 3 7 3-5 3 3 2-2"/></svg>`,
+  landslide: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 19l7-13 4 7 3-4 6 10z"/><path d="M2 19h20"/></svg>`,
+  drought: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="9" r="4.2"/><path d="M12 1.8v1.6M12 14.6v1.6M4.8 9h1.6M17.6 9h1.6M6.5 3.5l1.1 1.1M16.4 3.5l-1.1 1.1"/><path d="M4 20c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0 3 2 4.5 0" stroke-width="1.3"/><path d="M9 19v-3M14 19v-3" stroke-dasharray="1.5 1.5"/></svg>`,
+  extreme_heat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>`,
+  riverbank_erosion: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 6c4 0 4 3 8 3s4-3 8-3"/><path d="M2 6v14h20V6"/><path d="M6 12l2 2M10 15l2 2" stroke-dasharray="1.4 1.4"/></svg>`,
+};
+
+const HAZARDS = [
+  { key:'river_flood', name:'River flood',
+    desc:'Seasonal overflow of the Ganges–Brahmaputra–Meghna river system during monsoon.',
+    high:'Plan around annual monsoon inundation. Elevate critical infrastructure, keep evacuation routes above known flood lines, and budget for embankment maintenance.',
+    low:'Background exposure only. Keep monsoon drainage clear and monitor river-gauge bulletins during peak months.' },
+  { key:'flash_flood', name:'Flash flood',
+    desc:'Sudden, short-duration flooding from hill runoff or upstream cross-border rainfall, common around haor basins.',
+    high:'Early-warning coverage is essential — flash floods can arrive in hours. Avoid new construction in haor low points during pre-monsoon and monsoon windows.',
+    low:'Low likelihood, but keep an eye on upstream rainfall bulletins if near hill-fed streams.' },
+  { key:'coastal_flood', name:'Coastal flood',
+    desc:'Storm surge and tidal inundation along the Bay of Bengal coastline.',
+    high:'Prioritize cyclone shelters, surge-resistant embankments, and salinity-tolerant land use near the coast. Coordinate with the Cyclone Preparedness Programme.',
+    low:'Limited direct coastal exposure; surge risk is mainly a downstream concern for this area.' },
+  { key:'cyclone', name:'Cyclone',
+    desc:'Tropical cyclones forming in the Bay of Bengal, typically pre- and post-monsoon.',
+    high:'Maintain shelter capacity and wind-resistant building codes. Confirm early-warning signal broadcast reaches the last mile before each cyclone season.',
+    low:'Occasional peripheral effects only; standard seasonal awareness is sufficient.' },
+  { key:'earthquake', name:'Earthquake',
+    desc:'Seismic exposure from regional fault systems, including the Dauki fault near the northeast.',
+    high:'Apply seismic-resistant building codes for new construction and retrofit critical facilities. This zone sits closer to active regional fault activity.',
+    low:'Lower seismic exposure; standard code compliance is generally sufficient.' },
+  { key:'landslide', name:'Landslide',
+    desc:'Slope failure on hill terrain, often triggered by heavy rainfall.',
+    high:'Restrict settlement on steep cut slopes and monitor hill-side communities during heavy rainfall spells, especially in the Chittagong Hill Tracts.',
+    low:'Terrain is largely flat; landslide exposure is minimal.' },
+  { key:'drought', name:'Drought',
+    desc:'Extended dry-season water deficit, most pronounced on the Barind Tract in the northwest.',
+    high:'Invest in groundwater recharge and drought-tolerant cropping, particularly for the dry pre-monsoon season on the Barind Tract.',
+    low:'Adequate seasonal rainfall generally limits drought stress here.' },
+  { key:'extreme_heat', name:'Extreme heat',
+    desc:'Heatwave exposure, intensified by urban density in city cores.',
+    high:'Expand shaded public space and heat-health early warning, especially for outdoor labor and dense urban neighborhoods.',
+    low:'Heat stress is present but less acute than in denser urban centers.' },
+  { key:'riverbank_erosion', name:'Riverbank erosion',
+    desc:'Land loss along shifting river channels, notably the Padma, Jamuna, and Teesta.',
+    high:'Plan for population displacement and land-use flexibility along active erosion fronts; coordinate resettlement planning ahead of the monsoon.',
+    low:'Riverbank shifting is a minor, localized concern in this area.' },
+];
+
+const DIVISIONS = [
+  { id:'dhaka', name:'Dhaka', region:'Central', tagline:'The Padma–Meghna confluence and the country\u2019s densest urban core.',
+    h:{river_flood:'H',flash_flood:'L',coastal_flood:'VL',cyclone:'L',earthquake:'M',landslide:'VL',drought:'L',extreme_heat:'H',riverbank_erosion:'M'} },
+  { id:'chattogram', name:'Chattogram', region:'Southeast · coast & hills', tagline:'Port city framed by the Bay of Bengal and the Chittagong Hill Tracts.',
+    h:{river_flood:'M',flash_flood:'M',coastal_flood:'H',cyclone:'H',earthquake:'M',landslide:'H',drought:'L',extreme_heat:'M',riverbank_erosion:'L'} },
+  { id:'khulna', name:'Khulna', region:'Southwest coast', tagline:'Sundarbans-fringed delta, exposed to tidal surge and salinity.',
+    h:{river_flood:'M',flash_flood:'L',coastal_flood:'H',cyclone:'H',earthquake:'L',landslide:'VL',drought:'M',extreme_heat:'M',riverbank_erosion:'M'} },
+  { id:'rajshahi', name:'Rajshahi', region:'Northwest', tagline:'Barind Tract drylands above the eroding Padma River.',
+    h:{river_flood:'M',flash_flood:'L',coastal_flood:'VL',cyclone:'VL',earthquake:'L',landslide:'VL',drought:'H',extreme_heat:'H',riverbank_erosion:'H'} },
+  { id:'barisal', name:'Barisal', region:'South central coast', tagline:'Low-lying river delta opening directly onto the Bay of Bengal.',
+    h:{river_flood:'M',flash_flood:'L',coastal_flood:'H',cyclone:'H',earthquake:'L',landslide:'VL',drought:'L',extreme_heat:'M',riverbank_erosion:'M'} },
+  { id:'sylhet', name:'Sylhet', region:'Northeast · haor basin', tagline:'Wetland basin ringed by hills, closest division to regional fault activity.',
+    h:{river_flood:'H',flash_flood:'H',coastal_flood:'VL',cyclone:'L',earthquake:'H',landslide:'M',drought:'L',extreme_heat:'L',riverbank_erosion:'L'} },
+  { id:'rangpur', name:'Rangpur', region:'North', tagline:'Teesta River basin, prone to seasonal channel shifting.',
+    h:{river_flood:'M',flash_flood:'M',coastal_flood:'VL',cyclone:'VL',earthquake:'L',landslide:'VL',drought:'M',extreme_heat:'M',riverbank_erosion:'H'} },
+  { id:'mymensingh', name:'Mymensingh', region:'North central', tagline:'Foothill-fed plains at the base of the Meghalaya hills.',
+    h:{river_flood:'M',flash_flood:'H',coastal_flood:'VL',cyclone:'VL',earthquake:'M',landslide:'L',drought:'L',extreme_heat:'M',riverbank_erosion:'M'} },
+];
+
+const DISTRICTS = [{"id":"1","name":"Comilla","division":"chattogram","lat":23.4683,"lon":91.1788,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Barura","u":"barura.comilla.gov.bd"},{"n":"Brahmanpara","u":"brahmanpara.comilla.gov.bd"},{"n":"Burichang","u":"burichang.comilla.gov.bd"},{"n":"Chandina","u":"chandina.comilla.gov.bd"},{"n":"Chauddagram","u":"chauddagram.comilla.gov.bd"},{"n":"Comilla Sadar","u":"comillasadar.comilla.gov.bd"},{"n":"Daudkandi","u":"daudkandi.comilla.gov.bd"},{"n":"Debidwar","u":"debidwar.comilla.gov.bd"},{"n":"Homna","u":"homna.comilla.gov.bd"},{"n":"Laksam","u":"laksam.comilla.gov.bd"},{"n":"Lalmai","u":"lalmai.comilla.gov.bd"},{"n":"Meghna","u":"meghna.comilla.gov.bd"},{"n":"Monohargonj","u":"monohargonj.comilla.gov.bd"},{"n":"Muradnagar","u":"muradnagar.comilla.gov.bd"},{"n":"Nangalkot","u":"nangalkot.comilla.gov.bd"},{"n":"Sadarsouth","u":"sadarsouth.comilla.gov.bd"},{"n":"Titas","u":"titas.comilla.gov.bd"}]},{"id":"2","name":"Feni","division":"chattogram","lat":23.0232,"lon":91.3841,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Chhagalnaiya","u":"chhagalnaiya.feni.gov.bd"},{"n":"Daganbhuiyan","u":"daganbhuiyan.feni.gov.bd"},{"n":"Feni Sadar","u":"sadar.feni.gov.bd"},{"n":"Fulgazi","u":"fulgazi.feni.gov.bd"},{"n":"Parshuram","u":"parshuram.feni.gov.bd"},{"n":"Sonagazi","u":"sonagazi.feni.gov.bd"}]},{"id":"3","name":"Brahmanbaria","division":"chattogram","lat":23.9571,"lon":91.1119,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Akhaura","u":"akhaura.brahmanbaria.gov.bd"},{"n":"Ashuganj","u":"ashuganj.brahmanbaria.gov.bd"},{"n":"Bancharampur","u":"bancharampur.brahmanbaria.gov.bd"},{"n":"Bijoynagar","u":"bijoynagar.brahmanbaria.gov.bd    "},{"n":"Brahmanbaria Sadar","u":"sadar.brahmanbaria.gov.bd"},{"n":"Kasba","u":"kasba.brahmanbaria.gov.bd"},{"n":"Nabinagar","u":"nabinagar.brahmanbaria.gov.bd"},{"n":"Nasirnagar","u":"nasirnagar.brahmanbaria.gov.bd"},{"n":"Sarail","u":"sarail.brahmanbaria.gov.bd"}]},{"id":"4","name":"Rangamati","division":"chattogram","lat":22.6533,"lon":92.1738,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"H","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Baghaichari","u":"baghaichari.rangamati.gov.bd"},{"n":"Barkal","u":"barkal.rangamati.gov.bd"},{"n":"Belaichari","u":"belaichari.rangamati.gov.bd"},{"n":"Juraichari","u":"juraichari.rangamati.gov.bd"},{"n":"Kaptai","u":"kaptai.rangamati.gov.bd"},{"n":"Kawkhali","u":"kawkhali.rangamati.gov.bd"},{"n":"Langadu","u":"langadu.rangamati.gov.bd"},{"n":"Naniarchar","u":"naniarchar.rangamati.gov.bd"},{"n":"Rajasthali","u":"rajasthali.rangamati.gov.bd"},{"n":"Rangamati Sadar","u":"sadar.rangamati.gov.bd"}]},{"id":"5","name":"Noakhali","division":"chattogram","lat":22.8696,"lon":91.0994,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Begumganj","u":"begumganj.noakhali.gov.bd"},{"n":"Chatkhil","u":"chatkhil.noakhali.gov.bd"},{"n":"Companiganj","u":"companiganj.noakhali.gov.bd"},{"n":"Hatia","u":"hatia.noakhali.gov.bd"},{"n":"Kabirhat","u":"kabirhat.noakhali.gov.bd"},{"n":"Noakhali Sadar","u":"sadar.noakhali.gov.bd"},{"n":"Senbug","u":"senbug.noakhali.gov.bd"},{"n":"Sonaimori","u":"sonaimori.noakhali.gov.bd"},{"n":"Subarnachar","u":"subarnachar.noakhali.gov.bd"}]},{"id":"6","name":"Chandpur","division":"chattogram","lat":23.2333,"lon":90.6713,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Chandpur Sadar","u":"sadar.chandpur.gov.bd"},{"n":"Faridgonj","u":"faridgonj.chandpur.gov.bd"},{"n":"Haimchar","u":"haimchar.chandpur.gov.bd"},{"n":"Hajiganj","u":"hajiganj.chandpur.gov.bd"},{"n":"Kachua","u":"kachua.chandpur.gov.bd"},{"n":"Matlab North","u":"matlabnorth.chandpur.gov.bd"},{"n":"Matlab South","u":"matlabsouth.chandpur.gov.bd"},{"n":"Shahrasti","u":"shahrasti.chandpur.gov.bd"}]},{"id":"7","name":"Lakshmipur","division":"chattogram","lat":22.9425,"lon":90.8412,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Kamalnagar","u":"kamalnagar.lakshmipur.gov.bd"},{"n":"Lakshmipur Sadar","u":"sadar.lakshmipur.gov.bd"},{"n":"Raipur","u":"raipur.lakshmipur.gov.bd"},{"n":"Ramganj","u":"ramganj.lakshmipur.gov.bd"},{"n":"Ramgati","u":"ramgati.lakshmipur.gov.bd"}]},{"id":"8","name":"Chattogram","division":"chattogram","lat":22.3351,"lon":91.8341,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"H","riverbank_erosion":"L"},"upazilas":[{"n":"Anwara","u":"anwara.chittagong.gov.bd"},{"n":"Banshkhali","u":"banshkhali.chittagong.gov.bd"},{"n":"Boalkhali","u":"boalkhali.chittagong.gov.bd"},{"n":"Chandanaish","u":"chandanaish.chittagong.gov.bd"},{"n":"Fatikchhari","u":"fatikchhari.chittagong.gov.bd"},{"n":"Hathazari","u":"hathazari.chittagong.gov.bd"},{"n":"Karnafuli","u":"karnafuli.chittagong.gov.bd"},{"n":"Lohagara","u":"lohagara.chittagong.gov.bd"},{"n":"Mirsharai","u":"mirsharai.chittagong.gov.bd"},{"n":"Patiya","u":"patiya.chittagong.gov.bd"},{"n":"Rangunia","u":"rangunia.chittagong.gov.bd"},{"n":"Raozan","u":"raozan.chittagong.gov.bd"},{"n":"Sandwip","u":"sandwip.chittagong.gov.bd"},{"n":"Satkania","u":"satkania.chittagong.gov.bd"},{"n":"Sitakunda","u":"sitakunda.chittagong.gov.bd"}]},{"id":"9","name":"Cox’s Bazar","division":"chattogram","lat":21.4272,"lon":92.0058,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"H","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Chakaria","u":"chakaria.coxsbazar.gov.bd"},{"n":"Coxsbazar Sadar","u":"sadar.coxsbazar.gov.bd"},{"n":"Kutubdia","u":"kutubdia.coxsbazar.gov.bd"},{"n":"Moheshkhali","u":"moheshkhali.coxsbazar.gov.bd"},{"n":"Pekua","u":"pekua.coxsbazar.gov.bd"},{"n":"Ramu","u":"ramu.coxsbazar.gov.bd"},{"n":"Teknaf","u":"teknaf.coxsbazar.gov.bd"},{"n":"Ukhiya","u":"ukhiya.coxsbazar.gov.bd"}]},{"id":"10","name":"Khagrachhari","division":"chattogram","lat":23.1193,"lon":91.9847,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"H","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Dighinala","u":"dighinala.khagrachhari.gov.bd"},{"n":"Guimara","u":"guimara.khagrachhari.gov.bd"},{"n":"Khagrachhari Sadar","u":"sadar.khagrachhari.gov.bd"},{"n":"Laxmichhari","u":"laxmichhari.khagrachhari.gov.bd"},{"n":"Manikchari","u":"manikchari.khagrachhari.gov.bd"},{"n":"Matiranga","u":"matiranga.khagrachhari.gov.bd"},{"n":"Mohalchari","u":"mohalchari.khagrachhari.gov.bd"},{"n":"Panchari","u":"panchari.khagrachhari.gov.bd"},{"n":"Ramgarh","u":"ramgarh.khagrachhari.gov.bd"}]},{"id":"11","name":"Bandarban","division":"chattogram","lat":22.1953,"lon":92.2184,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"H","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Alikadam","u":"alikadam.bandarban.gov.bd"},{"n":"Bandarban Sadar","u":"sadar.bandarban.gov.bd"},{"n":"Lama","u":"lama.bandarban.gov.bd"},{"n":"Naikhongchhari","u":"naikhongchhari.bandarban.gov.bd"},{"n":"Rowangchhari","u":"rowangchhari.bandarban.gov.bd"},{"n":"Ruma","u":"ruma.bandarban.gov.bd"},{"n":"Thanchi","u":"thanchi.bandarban.gov.bd"}]},{"id":"12","name":"Sirajganj","division":"rajshahi","lat":24.4534,"lon":89.7007,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"M","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Belkuchi","u":"belkuchi.sirajganj.gov.bd"},{"n":"Chauhali","u":"chauhali.sirajganj.gov.bd"},{"n":"Kamarkhand","u":"kamarkhand.sirajganj.gov.bd"},{"n":"Kazipur","u":"kazipur.sirajganj.gov.bd"},{"n":"Raigonj","u":"raigonj.sirajganj.gov.bd"},{"n":"Shahjadpur","u":"shahjadpur.sirajganj.gov.bd"},{"n":"Sirajganj Sadar","u":"sirajganjsadar.sirajganj.gov.bd"},{"n":"Tarash","u":"tarash.sirajganj.gov.bd"},{"n":"Ullapara","u":"ullapara.sirajganj.gov.bd"}]},{"id":"13","name":"Pabna","division":"rajshahi","lat":23.9985,"lon":89.2336,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"M","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Atghoria","u":"atghoria.pabna.gov.bd"},{"n":"Bera","u":"bera.pabna.gov.bd"},{"n":"Bhangura","u":"bhangura.pabna.gov.bd"},{"n":"Chatmohar","u":"chatmohar.pabna.gov.bd"},{"n":"Faridpur","u":"faridpur.pabna.gov.bd"},{"n":"Ishurdi","u":"ishurdi.pabna.gov.bd"},{"n":"Pabna Sadar","u":"pabnasadar.pabna.gov.bd"},{"n":"Santhia","u":"santhia.pabna.gov.bd"},{"n":"Sujanagar","u":"sujanagar.pabna.gov.bd"}]},{"id":"14","name":"Bogura","division":"rajshahi","lat":24.8465,"lon":89.3778,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"M","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Adamdighi","u":"adamdighi.bogra.gov.bd"},{"n":"Bogra Sadar","u":"sadar.bogra.gov.bd"},{"n":"Dhunot","u":"dhunot.bogra.gov.bd"},{"n":"Dupchanchia","u":"dupchanchia.bogra.gov.bd"},{"n":"Gabtali","u":"gabtali.bogra.gov.bd"},{"n":"Kahaloo","u":"kahaloo.bogra.gov.bd"},{"n":"Nondigram","u":"nondigram.bogra.gov.bd"},{"n":"Shajahanpur","u":"shajahanpur.bogra.gov.bd"},{"n":"Shariakandi","u":"shariakandi.bogra.gov.bd"},{"n":"Sherpur","u":"sherpur.bogra.gov.bd"},{"n":"Shibganj","u":"shibganj.bogra.gov.bd"},{"n":"Sonatala","u":"sonatala.bogra.gov.bd"}]},{"id":"15","name":"Rajshahi","division":"rajshahi","lat":24.3745,"lon":88.6042,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"H","riverbank_erosion":"L"},"upazilas":[{"n":"Bagha","u":"bagha.rajshahi.gov.bd"},{"n":"Bagmara","u":"bagmara.rajshahi.gov.bd"},{"n":"Charghat","u":"charghat.rajshahi.gov.bd"},{"n":"Durgapur","u":"durgapur.rajshahi.gov.bd"},{"n":"Godagari","u":"godagari.rajshahi.gov.bd"},{"n":"Mohonpur","u":"mohonpur.rajshahi.gov.bd"},{"n":"Paba","u":"paba.rajshahi.gov.bd"},{"n":"Puthia","u":"puthia.rajshahi.gov.bd"},{"n":"Tanore","u":"tanore.rajshahi.gov.bd"}]},{"id":"16","name":"Natore","division":"rajshahi","lat":24.4206,"lon":89.0003,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bagatipara","u":"bagatipara.natore.gov.bd"},{"n":"Baraigram","u":"baraigram.natore.gov.bd"},{"n":"Gurudaspur","u":"gurudaspur.natore.gov.bd"},{"n":"Lalpur","u":"lalpur.natore.gov.bd"},{"n":"Naldanga","u":"naldanga.natore.gov.bd"},{"n":"Natore Sadar","u":"natoresadar.natore.gov.bd"},{"n":"Singra","u":"singra.natore.gov.bd"}]},{"id":"17","name":"Joypurhat","division":"rajshahi","lat":25.0968,"lon":89.0227,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Akkelpur","u":"akkelpur.joypurhat.gov.bd"},{"n":"Joypurhat Sadar","u":"joypurhatsadar.joypurhat.gov.bd"},{"n":"Kalai","u":"kalai.joypurhat.gov.bd"},{"n":"Khetlal","u":"khetlal.joypurhat.gov.bd"},{"n":"Panchbibi","u":"panchbibi.joypurhat.gov.bd"}]},{"id":"18","name":"Chapainawabganj","division":"rajshahi","lat":24.5965,"lon":88.2775,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bholahat","u":"bholahat.chapainawabganj.gov.bd"},{"n":"Chapainawabganj Sadar","u":"chapainawabganjsadar.chapainawabganj.gov.bd"},{"n":"Gomostapur","u":"gomostapur.chapainawabganj.gov.bd"},{"n":"Nachol","u":"nachol.chapainawabganj.gov.bd"},{"n":"Shibganj","u":"shibganj.chapainawabganj.gov.bd"}]},{"id":"19","name":"Naogaon","division":"rajshahi","lat":24.7936,"lon":88.9318,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Atrai","u":"atrai.naogaon.gov.bd"},{"n":"Badalgachi","u":"badalgachi.naogaon.gov.bd"},{"n":"Dhamoirhat","u":"dhamoirhat.naogaon.gov.bd"},{"n":"Manda","u":"manda.naogaon.gov.bd"},{"n":"Mohadevpur","u":"mohadevpur.naogaon.gov.bd"},{"n":"Naogaon Sadar","u":"naogaonsadar.naogaon.gov.bd"},{"n":"Niamatpur","u":"niamatpur.naogaon.gov.bd"},{"n":"Patnitala","u":"patnitala.naogaon.gov.bd"},{"n":"Porsha","u":"porsha.naogaon.gov.bd"},{"n":"Raninagar","u":"raninagar.naogaon.gov.bd"},{"n":"Sapahar","u":"sapahar.naogaon.gov.bd"}]},{"id":"20","name":"Jashore","division":"khulna","lat":23.1664,"lon":89.2081,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Abhaynagar","u":"abhaynagar.jessore.gov.bd"},{"n":"Bagherpara","u":"bagherpara.jessore.gov.bd"},{"n":"Chougachha","u":"chougachha.jessore.gov.bd"},{"n":"Jessore Sadar","u":"sadar.jessore.gov.bd"},{"n":"Jhikargacha","u":"jhikargacha.jessore.gov.bd"},{"n":"Keshabpur","u":"keshabpur.jessore.gov.bd"},{"n":"Manirampur","u":"manirampur.jessore.gov.bd"},{"n":"Sharsha","u":"sharsha.jessore.gov.bd"}]},{"id":"21","name":"Satkhira","division":"khulna","lat":22.7185,"lon":89.0705,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Assasuni","u":"assasuni.satkhira.gov.bd"},{"n":"Debhata","u":"debhata.satkhira.gov.bd"},{"n":"Kalaroa","u":"kalaroa.satkhira.gov.bd"},{"n":"Kaliganj","u":"kaliganj.satkhira.gov.bd"},{"n":"Satkhira Sadar","u":"satkhirasadar.satkhira.gov.bd"},{"n":"Shyamnagar","u":"shyamnagar.satkhira.gov.bd"},{"n":"Tala","u":"tala.satkhira.gov.bd"}]},{"id":"22","name":"Meherpur","division":"khulna","lat":23.7622,"lon":88.6318,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Gangni","u":"gangni.meherpur.gov.bd"},{"n":"Meherpur Sadar","u":"meherpursadar.meherpur.gov.bd"},{"n":"Mujibnagar","u":"mujibnagar.meherpur.gov.bd"}]},{"id":"23","name":"Narail","division":"khulna","lat":23.1725,"lon":89.5127,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Kalia","u":"kalia.narail.gov.bd"},{"n":"Lohagara","u":"lohagara.narail.gov.bd"},{"n":"Narail Sadar","u":"narailsadar.narail.gov.bd"}]},{"id":"24","name":"Chuadanga","division":"khulna","lat":23.6402,"lon":88.8418,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Alamdanga","u":"alamdanga.chuadanga.gov.bd"},{"n":"Chuadanga Sadar","u":"chuadangasadar.chuadanga.gov.bd"},{"n":"Damurhuda","u":"damurhuda.chuadanga.gov.bd"},{"n":"Jibannagar","u":"jibannagar.chuadanga.gov.bd"}]},{"id":"25","name":"Kushtia","division":"khulna","lat":23.9013,"lon":89.1205,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bheramara","u":"bheramara.kushtia.gov.bd"},{"n":"Daulatpur","u":"daulatpur.kushtia.gov.bd"},{"n":"Khoksa","u":"khoksa.kushtia.gov.bd"},{"n":"Kumarkhali","u":"kumarkhali.kushtia.gov.bd"},{"n":"Kushtia Sadar","u":"kushtiasadar.kushtia.gov.bd"},{"n":"Mirpur","u":"mirpurkushtia.kushtia.gov.bd"}]},{"id":"26","name":"Magura","division":"khulna","lat":23.4873,"lon":89.42,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Magura Sadar","u":"magurasadar.magura.gov.bd"},{"n":"Mohammadpur","u":"mohammadpur.magura.gov.bd"},{"n":"Shalikha","u":"shalikha.magura.gov.bd"},{"n":"Sreepur","u":"sreepur.magura.gov.bd"}]},{"id":"27","name":"Khulna","division":"khulna","lat":22.8158,"lon":89.5687,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"H","riverbank_erosion":"L"},"upazilas":[{"n":"Botiaghata","u":"botiaghata.khulna.gov.bd"},{"n":"Dakop","u":"dakop.khulna.gov.bd"},{"n":"Digholia","u":"digholia.khulna.gov.bd"},{"n":"Dumuria","u":"dumuria.khulna.gov.bd"},{"n":"Fultola","u":"fultola.khulna.gov.bd"},{"n":"Koyra","u":"koyra.khulna.gov.bd"},{"n":"Paikgasa","u":"paikgasa.khulna.gov.bd"},{"n":"Rupsha","u":"rupsha.khulna.gov.bd"},{"n":"Terokhada","u":"terokhada.khulna.gov.bd"}]},{"id":"28","name":"Bagerhat","division":"khulna","lat":22.6516,"lon":89.7859,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bagerhat Sadar","u":"sadar.bagerhat.gov.bd"},{"n":"Chitalmari","u":"chitalmari.bagerhat.gov.bd"},{"n":"Fakirhat","u":"fakirhat.bagerhat.gov.bd"},{"n":"Kachua","u":"kachua.bagerhat.gov.bd"},{"n":"Mollahat","u":"mollahat.bagerhat.gov.bd"},{"n":"Mongla","u":"mongla.bagerhat.gov.bd"},{"n":"Morrelganj","u":"morrelganj.bagerhat.gov.bd"},{"n":"Rampal","u":"rampal.bagerhat.gov.bd"},{"n":"Sarankhola","u":"sarankhola.bagerhat.gov.bd"}]},{"id":"29","name":"Jhenaidah","division":"khulna","lat":23.5448,"lon":89.1539,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Harinakundu","u":"harinakundu.jhenaidah.gov.bd"},{"n":"Jhenaidah Sadar","u":"sadar.jhenaidah.gov.bd"},{"n":"Kaliganj","u":"kaliganj.jhenaidah.gov.bd"},{"n":"Kotchandpur","u":"kotchandpur.jhenaidah.gov.bd"},{"n":"Moheshpur","u":"moheshpur.jhenaidah.gov.bd"},{"n":"Shailkupa","u":"shailkupa.jhenaidah.gov.bd"}]},{"id":"30","name":"Jhalakathi","division":"barisal","lat":22.6406,"lon":90.1987,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Jhalakathi Sadar","u":"sadar.jhalakathi.gov.bd"},{"n":"Kathalia","u":"kathalia.jhalakathi.gov.bd"},{"n":"Nalchity","u":"nalchity.jhalakathi.gov.bd"},{"n":"Rajapur","u":"rajapur.jhalakathi.gov.bd"}]},{"id":"31","name":"Patuakhali","division":"barisal","lat":22.3596,"lon":90.3299,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bauphal","u":"bauphal.patuakhali.gov.bd"},{"n":"Dashmina","u":"dashmina.patuakhali.gov.bd"},{"n":"Dumki","u":"dumki.patuakhali.gov.bd"},{"n":"Galachipa","u":"galachipa.patuakhali.gov.bd"},{"n":"Kalapara","u":"kalapara.patuakhali.gov.bd"},{"n":"Mirzaganj","u":"mirzaganj.patuakhali.gov.bd"},{"n":"Patuakhali Sadar","u":"sadar.patuakhali.gov.bd"},{"n":"Rangabali","u":"rangabali.patuakhali.gov.bd"}]},{"id":"32","name":"Pirojpur","division":"barisal","lat":22.5841,"lon":89.972,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bhandaria","u":"bhandaria.pirojpur.gov.bd"},{"n":"Kawkhali","u":"kawkhali.pirojpur.gov.bd"},{"n":"Mathbaria","u":"mathbaria.pirojpur.gov.bd"},{"n":"Nazirpur","u":"nazirpur.pirojpur.gov.bd"},{"n":"Nesarabad","u":"nesarabad.pirojpur.gov.bd"},{"n":"Pirojpur Sadar","u":"sadar.pirojpur.gov.bd"},{"n":"Zianagar","u":"zianagar.pirojpur.gov.bd"}]},{"id":"33","name":"Barisal","division":"barisal","lat":22.701,"lon":90.3535,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Agailjhara","u":"agailjhara.barisal.gov.bd"},{"n":"Babuganj","u":"babuganj.barisal.gov.bd"},{"n":"Bakerganj","u":"bakerganj.barisal.gov.bd"},{"n":"Banaripara","u":"banaripara.barisal.gov.bd"},{"n":"Barisal Sadar","u":"barisalsadar.barisal.gov.bd"},{"n":"Gournadi","u":"gournadi.barisal.gov.bd"},{"n":"Hizla","u":"hizla.barisal.gov.bd"},{"n":"Mehendiganj","u":"mehendiganj.barisal.gov.bd"},{"n":"Muladi","u":"muladi.barisal.gov.bd"},{"n":"Wazirpur","u":"wazirpur.barisal.gov.bd"}]},{"id":"34","name":"Bhola","division":"barisal","lat":22.6859,"lon":90.6482,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Bhola Sadar","u":"sadar.bhola.gov.bd"},{"n":"Borhan Sddin","u":"borhanuddin.bhola.gov.bd"},{"n":"Charfesson","u":"charfesson.bhola.gov.bd"},{"n":"Doulatkhan","u":"doulatkhan.bhola.gov.bd"},{"n":"Lalmohan","u":"lalmohan.bhola.gov.bd"},{"n":"Monpura","u":"monpura.bhola.gov.bd"},{"n":"Tazumuddin","u":"tazumuddin.bhola.gov.bd"}]},{"id":"35","name":"Barguna","division":"barisal","lat":22.1591,"lon":90.1264,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"H","cyclone":"H","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Amtali","u":"amtali.barguna.gov.bd"},{"n":"Bamna","u":"bamna.barguna.gov.bd"},{"n":"Barguna Sadar","u":"sadar.barguna.gov.bd"},{"n":"Betagi","u":"betagi.barguna.gov.bd"},{"n":"Pathorghata","u":"pathorghata.barguna.gov.bd"},{"n":"Taltali","u":"taltali.barguna.gov.bd"}]},{"id":"36","name":"Sylhet","division":"sylhet","lat":24.8898,"lon":91.8698,"h":{"river_flood":"M","flash_flood":"H","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Balaganj","u":"balaganj.sylhet.gov.bd"},{"n":"Beanibazar","u":"beanibazar.sylhet.gov.bd"},{"n":"Bishwanath","u":"bishwanath.sylhet.gov.bd"},{"n":"Companiganj","u":"companiganj.sylhet.gov.bd"},{"n":"Dakshinsurma","u":"dakshinsurma.sylhet.gov.bd"},{"n":"Fenchuganj","u":"fenchuganj.sylhet.gov.bd"},{"n":"Golapganj","u":"golapganj.sylhet.gov.bd"},{"n":"Gowainghat","u":"gowainghat.sylhet.gov.bd"},{"n":"Jaintiapur","u":"jaintiapur.sylhet.gov.bd"},{"n":"Kanaighat","u":"kanaighat.sylhet.gov.bd"},{"n":"Osmaninagar","u":"osmaninagar.sylhet.gov.bd"},{"n":"Sylhet Sadar","u":"sylhetsadar.sylhet.gov.bd"},{"n":"Zakiganj","u":"zakiganj.sylhet.gov.bd"}]},{"id":"37","name":"Moulvibazar","division":"sylhet","lat":24.4829,"lon":91.7774,"h":{"river_flood":"M","flash_flood":"H","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Barlekha","u":"barlekha.moulvibazar.gov.bd"},{"n":"Juri","u":"juri.moulvibazar.gov.bd"},{"n":"Kamolganj","u":"kamolganj.moulvibazar.gov.bd"},{"n":"Kulaura","u":"kulaura.moulvibazar.gov.bd"},{"n":"Moulvibazar Sadar","u":"moulvibazarsadar.moulvibazar.gov.bd"},{"n":"Rajnagar","u":"rajnagar.moulvibazar.gov.bd"},{"n":"Sreemangal","u":"sreemangal.moulvibazar.gov.bd"}]},{"id":"38","name":"Habiganj","division":"sylhet","lat":24.3749,"lon":91.4155,"h":{"river_flood":"M","flash_flood":"H","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Ajmiriganj","u":"ajmiriganj.habiganj.gov.bd"},{"n":"Bahubal","u":"bahubal.habiganj.gov.bd"},{"n":"Baniachong","u":"baniachong.habiganj.gov.bd"},{"n":"Chunarughat","u":"chunarughat.habiganj.gov.bd"},{"n":"Habiganj Sadar","u":"habiganjsadar.habiganj.gov.bd"},{"n":"Lakhai","u":"lakhai.habiganj.gov.bd"},{"n":"Madhabpur","u":"madhabpur.habiganj.gov.bd"},{"n":"Nabiganj","u":"nabiganj.habiganj.gov.bd"}]},{"id":"39","name":"Sunamganj","division":"sylhet","lat":25.0658,"lon":91.395,"h":{"river_flood":"M","flash_flood":"H","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bishwambarpur","u":"bishwambarpur.sunamganj.gov.bd"},{"n":"Chhatak","u":"chhatak.sunamganj.gov.bd"},{"n":"Derai","u":"derai.sunamganj.gov.bd"},{"n":"Dharmapasha","u":"dharmapasha.sunamganj.gov.bd"},{"n":"Dowarabazar","u":"dowarabazar.sunamganj.gov.bd"},{"n":"Jagannathpur","u":"jagannathpur.sunamganj.gov.bd"},{"n":"Jamalganj","u":"jamalganj.sunamganj.gov.bd"},{"n":"Shalla","u":"shalla.sunamganj.gov.bd"},{"n":"South Sunamganj","u":"southsunamganj.sunamganj.gov.bd"},{"n":"Sunamganj Sadar","u":"sadar.sunamganj.gov.bd"},{"n":"Tahirpur","u":"tahirpur.sunamganj.gov.bd"}]},{"id":"40","name":"Narsingdi","division":"dhaka","lat":23.9322,"lon":90.7154,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"H","riverbank_erosion":"L"},"upazilas":[{"n":"Belabo","u":"belabo.narsingdi.gov.bd"},{"n":"Monohardi","u":"monohardi.narsingdi.gov.bd"},{"n":"Narsingdi Sadar","u":"narsingdisadar.narsingdi.gov.bd"},{"n":"Palash","u":"palash.narsingdi.gov.bd"},{"n":"Raipura","u":"raipura.narsingdi.gov.bd"},{"n":"Shibpur","u":"shibpur.narsingdi.gov.bd"}]},{"id":"41","name":"Gazipur","division":"dhaka","lat":24.0023,"lon":90.4264,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"H","riverbank_erosion":"L"},"upazilas":[{"n":"Gazipur Sadar","u":"sadar.gazipur.gov.bd"},{"n":"Kaliakair","u":"kaliakair.gazipur.gov.bd"},{"n":"Kaliganj","u":"kaliganj.gazipur.gov.bd"},{"n":"Kapasia","u":"kapasia.gazipur.gov.bd"},{"n":"Sreepur","u":"sreepur.gazipur.gov.bd"}]},{"id":"42","name":"Shariatpur","division":"dhaka","lat":23.2423,"lon":90.4348,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Bhedarganj","u":"bhedarganj.shariatpur.gov.bd"},{"n":"Damudya","u":"damudya.shariatpur.gov.bd"},{"n":"Gosairhat","u":"gosairhat.shariatpur.gov.bd"},{"n":"Naria","u":"naria.shariatpur.gov.bd"},{"n":"Shariatpur Sadar","u":"sadar.shariatpur.gov.bd"},{"n":"Zajira","u":"zajira.shariatpur.gov.bd"}]},{"id":"43","name":"Narayanganj","division":"dhaka","lat":23.6337,"lon":90.4965,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"H","riverbank_erosion":"L"},"upazilas":[{"n":"Araihazar","u":"araihazar.narayanganj.gov.bd"},{"n":"Bandar","u":"bandar.narayanganj.gov.bd"},{"n":"Narayanganj Sadar","u":"narayanganjsadar.narayanganj.gov.bd"},{"n":"Rupganj","u":"rupganj.narayanganj.gov.bd"},{"n":"Sonargaon","u":"sonargaon.narayanganj.gov.bd"}]},{"id":"44","name":"Tangail","division":"dhaka","lat":24.2513,"lon":89.9167,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Basail","u":"basail.tangail.gov.bd"},{"n":"Bhuapur","u":"bhuapur.tangail.gov.bd"},{"n":"Delduar","u":"delduar.tangail.gov.bd"},{"n":"Dhanbari","u":"dhanbari.tangail.gov.bd"},{"n":"Ghatail","u":"ghatail.tangail.gov.bd"},{"n":"Gopalpur","u":"gopalpur.tangail.gov.bd"},{"n":"Kalihati","u":"kalihati.tangail.gov.bd"},{"n":"Madhupur","u":"madhupur.tangail.gov.bd"},{"n":"Mirzapur","u":"mirzapur.tangail.gov.bd"},{"n":"Nagarpur","u":"nagarpur.tangail.gov.bd"},{"n":"Sakhipur","u":"sakhipur.tangail.gov.bd"},{"n":"Tangail Sadar","u":"tangailsadar.tangail.gov.bd"}]},{"id":"45","name":"Kishoreganj","division":"dhaka","lat":24.4449,"lon":90.7766,"h":{"river_flood":"H","flash_flood":"H","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Austagram","u":"austagram.kishoreganj.gov.bd"},{"n":"Bajitpur","u":"bajitpur.kishoreganj.gov.bd"},{"n":"Bhairab","u":"bhairab.kishoreganj.gov.bd"},{"n":"Hossainpur","u":"hossainpur.kishoreganj.gov.bd"},{"n":"Itna","u":"itna.kishoreganj.gov.bd"},{"n":"Karimgonj","u":"karimgonj.kishoreganj.gov.bd"},{"n":"Katiadi","u":"katiadi.kishoreganj.gov.bd"},{"n":"Kishoreganj Sadar","u":"kishoreganjsadar.kishoreganj.gov.bd"},{"n":"Kuliarchar","u":"kuliarchar.kishoreganj.gov.bd"},{"n":"Mithamoin","u":"mithamoin.kishoreganj.gov.bd"},{"n":"Nikli","u":"nikli.kishoreganj.gov.bd"},{"n":"Pakundia","u":"pakundia.kishoreganj.gov.bd"},{"n":"Tarail","u":"tarail.kishoreganj.gov.bd"}]},{"id":"46","name":"Manikganj","division":"dhaka","lat":23.8644,"lon":90.0047,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Doulatpur","u":"doulatpur.manikganj.gov.bd"},{"n":"Gior","u":"gior.manikganj.gov.bd"},{"n":"Harirampur","u":"harirampur.manikganj.gov.bd"},{"n":"Manikganj Sadar","u":"sadar.manikganj.gov.bd"},{"n":"Saturia","u":"saturia.manikganj.gov.bd"},{"n":"Shibaloy","u":"shibaloy.manikganj.gov.bd"},{"n":"Singiar","u":"singiar.manikganj.gov.bd"}]},{"id":"47","name":"Dhaka","division":"dhaka","lat":23.7115,"lon":90.4111,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"H","riverbank_erosion":"L"},"upazilas":[{"n":"Dhamrai","u":"dhamrai.dhaka.gov.bd"},{"n":"Dohar","u":"dohar.dhaka.gov.bd"},{"n":"Keraniganj","u":"keraniganj.dhaka.gov.bd"},{"n":"Nawabganj","u":"nawabganj.dhaka.gov.bd"},{"n":"Savar","u":"savar.dhaka.gov.bd"}]},{"id":"48","name":"Munshiganj","division":"dhaka","lat":23.5422,"lon":90.5305,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Gajaria","u":"gajaria.munshiganj.gov.bd"},{"n":"Louhajanj","u":"louhajanj.munshiganj.gov.bd"},{"n":"Munshiganj Sadar","u":"sadar.munshiganj.gov.bd"},{"n":"Sirajdikhan","u":"sirajdikhan.munshiganj.gov.bd"},{"n":"Sreenagar","u":"sreenagar.munshiganj.gov.bd"},{"n":"Tongibari","u":"tongibari.munshiganj.gov.bd"}]},{"id":"49","name":"Rajbari","division":"dhaka","lat":23.7574,"lon":89.6445,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Baliakandi","u":"baliakandi.rajbari.gov.bd"},{"n":"Goalanda","u":"goalanda.rajbari.gov.bd"},{"n":"Kalukhali","u":"kalukhali.rajbari.gov.bd"},{"n":"Pangsa","u":"pangsa.rajbari.gov.bd"},{"n":"Rajbari Sadar","u":"sadar.rajbari.gov.bd"}]},{"id":"50","name":"Madaripur","division":"dhaka","lat":23.1641,"lon":90.1897,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Kalkini","u":"kalkini.madaripur.gov.bd"},{"n":"Madaripur Sadar","u":"sadar.madaripur.gov.bd"},{"n":"Rajoir","u":"rajoir.madaripur.gov.bd"},{"n":"Shibchar","u":"shibchar.madaripur.gov.bd"}]},{"id":"51","name":"Gopalganj","division":"dhaka","lat":23.0051,"lon":89.8266,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Gopalganj Sadar","u":"sadar.gopalganj.gov.bd"},{"n":"Kashiani","u":"kashiani.gopalganj.gov.bd"},{"n":"Kotalipara","u":"kotalipara.gopalganj.gov.bd"},{"n":"Muksudpur","u":"muksudpur.gopalganj.gov.bd"},{"n":"Tungipara","u":"tungipara.gopalganj.gov.bd"}]},{"id":"52","name":"Faridpur","division":"dhaka","lat":23.6071,"lon":89.8429,"h":{"river_flood":"H","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Alfadanga","u":"alfadanga.faridpur.gov.bd"},{"n":"Bhanga","u":"bhanga.faridpur.gov.bd"},{"n":"Boalmari","u":"boalmari.faridpur.gov.bd"},{"n":"Charbhadrasan","u":"charbhadrasan.faridpur.gov.bd"},{"n":"Faridpur Sadar","u":"sadar.faridpur.gov.bd"},{"n":"Madhukhali","u":"madhukhali.faridpur.gov.bd"},{"n":"Nagarkanda","u":"nagarkanda.faridpur.gov.bd"},{"n":"Sadarpur","u":"sadarpur.faridpur.gov.bd"},{"n":"Saltha","u":"saltha.faridpur.gov.bd"}]},{"id":"53","name":"Panchagarh","division":"rangpur","lat":26.3411,"lon":88.5542,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"M","riverbank_erosion":"M"},"upazilas":[{"n":"Atwari","u":"atwari.panchagarh.gov.bd"},{"n":"Boda","u":"boda.panchagarh.gov.bd"},{"n":"Debiganj","u":"debiganj.panchagarh.gov.bd"},{"n":"Panchagarh Sadar","u":"panchagarhsadar.panchagarh.gov.bd"},{"n":"Tetulia","u":"tetulia.panchagarh.gov.bd"}]},{"id":"54","name":"Dinajpur","division":"rangpur","lat":25.6217,"lon":88.6355,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"M","riverbank_erosion":"M"},"upazilas":[{"n":"Birampur","u":"birampur.dinajpur.gov.bd"},{"n":"Birganj","u":"birganj.dinajpur.gov.bd"},{"n":"Birol","u":"birol.dinajpur.gov.bd"},{"n":"Bochaganj","u":"bochaganj.dinajpur.gov.bd"},{"n":"Chirirbandar","u":"chirirbandar.dinajpur.gov.bd"},{"n":"Dinajpur Sadar","u":"dinajpursadar.dinajpur.gov.bd"},{"n":"Fulbari","u":"fulbari.dinajpur.gov.bd"},{"n":"Ghoraghat","u":"ghoraghat.dinajpur.gov.bd"},{"n":"Hakimpur","u":"hakimpur.dinajpur.gov.bd"},{"n":"Kaharol","u":"kaharol.dinajpur.gov.bd"},{"n":"Khansama","u":"khansama.dinajpur.gov.bd"},{"n":"Nawabganj","u":"nawabganj.dinajpur.gov.bd"},{"n":"Parbatipur","u":"parbatipur.dinajpur.gov.bd"}]},{"id":"55","name":"Lalmonirhat","division":"rangpur","lat":25.9923,"lon":89.2847,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"M"},"upazilas":[{"n":"Aditmari","u":"aditmari.lalmonirhat.gov.bd"},{"n":"Hatibandha","u":"hatibandha.lalmonirhat.gov.bd"},{"n":"Kaliganj","u":"kaliganj.lalmonirhat.gov.bd"},{"n":"Lalmonirhat Sadar","u":"sadar.lalmonirhat.gov.bd"},{"n":"Patgram","u":"patgram.lalmonirhat.gov.bd"}]},{"id":"56","name":"Nilphamari","division":"rangpur","lat":25.9318,"lon":88.856,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"M"},"upazilas":[{"n":"Dimla","u":"dimla.nilphamari.gov.bd"},{"n":"Domar","u":"domar.nilphamari.gov.bd"},{"n":"Jaldhaka","u":"jaldhaka.nilphamari.gov.bd"},{"n":"Kishorganj","u":"kishorganj.nilphamari.gov.bd"},{"n":"Nilphamari Sadar","u":"nilphamarisadar.nilphamari.gov.bd"},{"n":"Syedpur","u":"syedpur.nilphamari.gov.bd"}]},{"id":"57","name":"Gaibandha","division":"rangpur","lat":25.3288,"lon":89.5281,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Gaibandha Sadar","u":"gaibandhasadar.gaibandha.gov.bd"},{"n":"Gobindaganj","u":"gobindaganj.gaibandha.gov.bd"},{"n":"Palashbari","u":"palashbari.gaibandha.gov.bd"},{"n":"Phulchari","u":"phulchari.gaibandha.gov.bd"},{"n":"Sadullapur","u":"sadullapur.gaibandha.gov.bd"},{"n":"Saghata","u":"saghata.gaibandha.gov.bd"},{"n":"Sundarganj","u":"sundarganj.gaibandha.gov.bd"}]},{"id":"58","name":"Thakurgaon","division":"rangpur","lat":26.0337,"lon":88.4617,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"H","extreme_heat":"M","riverbank_erosion":"M"},"upazilas":[{"n":"Baliadangi","u":"baliadangi.thakurgaon.gov.bd"},{"n":"Haripur","u":"haripur.thakurgaon.gov.bd"},{"n":"Pirganj","u":"pirganj.thakurgaon.gov.bd"},{"n":"Ranisankail","u":"ranisankail.thakurgaon.gov.bd"},{"n":"Thakurgaon Sadar","u":"thakurgaonsadar.thakurgaon.gov.bd"}]},{"id":"59","name":"Rangpur","division":"rangpur","lat":25.7558,"lon":89.2445,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"M"},"upazilas":[{"n":"Badargonj","u":"badargonj.rangpur.gov.bd"},{"n":"Gangachara","u":"gangachara.rangpur.gov.bd"},{"n":"Kaunia","u":"kaunia.rangpur.gov.bd"},{"n":"Mithapukur","u":"mithapukur.rangpur.gov.bd"},{"n":"Pirgacha","u":"pirgacha.rangpur.gov.bd"},{"n":"Pirgonj","u":"pirgonj.rangpur.gov.bd"},{"n":"Rangpur Sadar","u":"rangpursadar.rangpur.gov.bd"},{"n":"Taragonj","u":"taragonj.rangpur.gov.bd"}]},{"id":"60","name":"Kurigram","division":"rangpur","lat":25.8054,"lon":89.6362,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Bhurungamari","u":"bhurungamari.kurigram.gov.bd"},{"n":"Charrajibpur","u":"charrajibpur.kurigram.gov.bd"},{"n":"Chilmari","u":"chilmari.kurigram.gov.bd"},{"n":"Kurigram Sadar","u":"kurigramsadar.kurigram.gov.bd"},{"n":"Nageshwari","u":"nageshwari.kurigram.gov.bd"},{"n":"Phulbari","u":"phulbari.kurigram.gov.bd"},{"n":"Rajarhat","u":"rajarhat.kurigram.gov.bd"},{"n":"Rowmari","u":"rowmari.kurigram.gov.bd"},{"n":"Ulipur","u":"ulipur.kurigram.gov.bd"}]},{"id":"61","name":"Sherpur","division":"mymensingh","lat":25.0205,"lon":90.0153,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Jhenaigati","u":"jhenaigati.sherpur.gov.bd"},{"n":"Nalitabari","u":"nalitabari.sherpur.gov.bd"},{"n":"Nokla","u":"nokla.sherpur.gov.bd"},{"n":"Sherpur Sadar","u":"sherpursadar.sherpur.gov.bd"},{"n":"Sreebordi","u":"sreebordi.sherpur.gov.bd"}]},{"id":"62","name":"Mymensingh","division":"mymensingh","lat":24.7471,"lon":90.4203,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Bhaluka","u":"bhaluka.mymensingh.gov.bd"},{"n":"Dhobaura","u":"dhobaura.mymensingh.gov.bd"},{"n":"Fulbaria","u":"fulbaria.mymensingh.gov.bd"},{"n":"Gafargaon","u":"gafargaon.mymensingh.gov.bd"},{"n":"Gouripur","u":"gouripur.mymensingh.gov.bd"},{"n":"Haluaghat","u":"haluaghat.mymensingh.gov.bd"},{"n":"Iswarganj","u":"iswarganj.mymensingh.gov.bd"},{"n":"Muktagacha","u":"muktagacha.mymensingh.gov.bd"},{"n":"Mymensingh Sadar","u":"mymensinghsadar.mymensingh.gov.bd"},{"n":"Nandail","u":"nandail.mymensingh.gov.bd"},{"n":"Phulpur","u":"phulpur.mymensingh.gov.bd"},{"n":"Tarakanda","u":"tarakanda.mymensingh.gov.bd"},{"n":"Trishal","u":"trishal.mymensingh.gov.bd"}]},{"id":"63","name":"Jamalpur","division":"mymensingh","lat":24.9375,"lon":89.9378,"h":{"river_flood":"M","flash_flood":"L","coastal_flood":"VL","cyclone":"VL","earthquake":"L","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"H"},"upazilas":[{"n":"Bokshiganj","u":"bokshiganj.jamalpur.gov.bd"},{"n":"Dewangonj","u":"dewangonj.jamalpur.gov.bd"},{"n":"Islampur","u":"islampur.jamalpur.gov.bd"},{"n":"Jamalpur Sadar","u":"jamalpursadar.jamalpur.gov.bd"},{"n":"Madarganj","u":"madarganj.jamalpur.gov.bd"},{"n":"Melandah","u":"melandah.jamalpur.gov.bd"},{"n":"Sarishabari","u":"sarishabari.jamalpur.gov.bd"}]},{"id":"64","name":"Netrokona","division":"mymensingh","lat":24.871,"lon":90.7279,"h":{"river_flood":"M","flash_flood":"H","coastal_flood":"VL","cyclone":"VL","earthquake":"H","landslide":"VL","drought":"L","extreme_heat":"M","riverbank_erosion":"L"},"upazilas":[{"n":"Atpara","u":"atpara.netrokona.gov.bd"},{"n":"Barhatta","u":"barhatta.netrokona.gov.bd"},{"n":"Durgapur","u":"durgapur.netrokona.gov.bd"},{"n":"Kalmakanda","u":"kalmakanda.netrokona.gov.bd"},{"n":"Kendua","u":"kendua.netrokona.gov.bd"},{"n":"Khaliajuri","u":"khaliajuri.netrokona.gov.bd"},{"n":"Madan","u":"madan.netrokona.gov.bd"},{"n":"Mohongonj","u":"mohongonj.netrokona.gov.bd"},{"n":"Netrokona Sadar","u":"netrokonasadar.netrokona.gov.bd"},{"n":"Purbadhala","u":"purbadhala.netrokona.gov.bd"}]}];
+
+let activeId = 'dhaka';
+let activeDistrictId = null;
+let openHazard = null;
+
+function highestLevel(hazMap){
+  for(const lvl of ORDER){
+    if(Object.values(hazMap).includes(lvl)) return lvl;
+  }
+  return 'VL';
+}
+
+function renderNav(){
+  const list = document.getElementById('divisionList');
+  list.innerHTML = '';
+  DIVISIONS.forEach(d=>{
+    const li = document.createElement('li');
+    if(d.id===activeId) li.className='active';
+    const top = highestLevel(d.h);
+    li.innerHTML = `<button data-id="${d.id}">
+        <span class="dot" style="background:${LEVELS[top].color}"></span>${d.name}
+        <span class="region">${d.region}</span>
+      </button>`;
+    list.appendChild(li);
+  });
+  list.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeId = btn.dataset.id;
+      activeDistrictId = null;
+      openHazard = null;
+      renderAll();
+    });
+  });
+}
+
+function renderHazardGrid(hazMap){
+  const grid = document.getElementById('hazardGrid');
+  grid.innerHTML = '';
+  const sorted = [...HAZARDS].sort((a,b)=> ORDER.indexOf(hazMap[a.key]) - ORDER.indexOf(hazMap[b.key]) );
+  sorted.forEach(hz=>{
+    const lvl = hazMap[hz.key];
+    const meta = LEVELS[lvl];
+    const isOpen = openHazard === hz.key;
+    const card = document.createElement('div');
+    card.className = 'hcard' + (isOpen ? ' open' : '');
+    card.innerHTML = `
+      <div class="hcard-top">
+        <div class="hazard-name">${ICONS[hz.key]}${hz.name}</div>
+        <div class="level-tag" style="color:${meta.color};background:${meta.bg}">${meta.label}</div>
+      </div>
+      <div class="desc">${hz.desc}</div>
+      <div class="advice">
+        <span class="lab">Planning note</span>
+        ${(lvl==='H'||lvl==='M') ? hz.high : hz.low}
+      </div>
+      <div class="toggle-hint">${isOpen ? 'Click to collapse' : 'Click for planning note'}</div>
+    `;
+    card.addEventListener('click', ()=>{
+      openHazard = isOpen ? null : hz.key;
+      renderHazardGrid(hazMap);
+    });
+    grid.appendChild(card);
+  });
+}
+
+/* ---------- projection for the district map ---------- */
+let PROJ = null;
+function getProjection(){
+  if(PROJ) return PROJ;
+  const lats = DISTRICTS.map(d=>d.lat), lons = DISTRICTS.map(d=>d.lon);
+  const latMin = Math.min(...lats), latMax = Math.max(...lats);
+  const lonMin = Math.min(...lons), lonMax = Math.max(...lons);
+  const padPct = 0.10;
+  const latPad = (latMax-latMin)*padPct, lonPad = (lonMax-lonMin)*padPct;
+  const W = 320, H = 400;
+  PROJ = { latMin:latMin-latPad, latMax:latMax+latPad, lonMin:lonMin-lonPad, lonMax:lonMax+lonPad, W, H };
+  return PROJ;
+}
+function project(lat, lon){
+  const p = getProjection();
+  const x = (lon - p.lonMin) / (p.lonMax - p.lonMin) * p.W;
+  const y = (p.latMax - lat) / (p.latMax - p.latMin) * p.H;
+  return {x, y};
+}
+
+function renderMap(){
+  const p = getProjection();
+  const dots = DISTRICTS.map(d=>{
+    const {x,y} = project(d.lat, d.lon);
+    const isActiveDiv = d.division === activeId;
+    const isActiveDist = d.id === activeDistrictId;
+    const lvl = highestLevel(d.h);
+    const r = isActiveDist ? 6.5 : (isActiveDiv ? 4.6 : 2.6);
+    const op = isActiveDist ? 1 : (isActiveDiv ? 0.95 : 0.28);
+    const ring = isActiveDist ? `<circle cx="${x}" cy="${y}" r="${r+3.5}" fill="none" stroke="var(--ink)" stroke-width="1.4"/>` : '';
+    return `${ring}<circle class="dist-dot" data-id="${d.id}" cx="${x}" cy="${y}" r="${r}" fill="${LEVELS[lvl].color}" opacity="${op}"><title>${d.name}</title></circle>`;
+  }).join('');
+
+  const svg = `<svg viewBox="0 0 ${p.W} ${p.H}" xmlns="http://www.w3.org/2000/svg">${dots}</svg>`;
+  document.getElementById('mapWrap').innerHTML = svg;
+  document.querySelectorAll('.dist-dot').forEach(dot=>{
+    dot.addEventListener('click', ()=>{
+      const d = DISTRICTS.find(x=>x.id===dot.dataset.id);
+      activeId = d.division;
+      activeDistrictId = d.id;
+      openHazard = null;
+      renderAll();
+    });
+  });
+}
+
+function renderDistrictChips(){
+  const wrap = document.getElementById('districtChips');
+  const dList = DISTRICTS.filter(d=>d.division===activeId).sort((a,b)=>a.name.localeCompare(b.name));
+  wrap.innerHTML = '';
+  dList.forEach(d=>{
+    const btn = document.createElement('button');
+    if(d.id===activeDistrictId) btn.className = 'active';
+    btn.textContent = d.name;
+    btn.addEventListener('click', ()=>{
+      activeDistrictId = (activeDistrictId===d.id) ? null : d.id;
+      openHazard = null;
+      renderAll();
+    });
+    wrap.appendChild(btn);
+  });
+  document.getElementById('mapLabel').textContent = `Districts in ${DIVISIONS.find(x=>x.id===activeId).name} (${dList.length}) — click a dot or name for an upazila-level briefing`;
+}
+
+function renderUpazilas(district){
+  const section = document.getElementById('upazilaSection');
+  if(!district){ section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  document.getElementById('upazilaLabel').textContent = `Upazilas in ${district.name} (${district.upazilas.length}) — name & administration line`;
+  document.getElementById('upazilaChips').innerHTML = district.upazilas.map(u=>
+    `<span>${u.n}${u.u ? `<em>${u.u}</em>` : ''}</span>`
+  ).join('');
+}
+
+function renderMain(){
+  const div = DIVISIONS.find(d=>d.id===activeId);
+  const district = activeDistrictId ? DISTRICTS.find(d=>d.id===activeDistrictId) : null;
+  const backBtn = document.getElementById('backToDivision');
+
+  if(district){
+    document.getElementById('divName').textContent = district.name;
+    document.getElementById('divTagline').textContent = `${div.name} Division · a district-level view built from real administrative boundaries, with illustrative hazard levels.`;
+    renderHazardGrid(district.h);
+    const highCount = Object.values(district.h).filter(l=>l==='H').length;
+    document.getElementById('highCount').textContent = highCount;
+    backBtn.style.display = 'inline';
+    renderUpazilas(district);
+  } else {
+    document.getElementById('divName').textContent = div.name;
+    document.getElementById('divTagline').textContent = div.tagline;
+    renderHazardGrid(div.h);
+    const highCount = Object.values(div.h).filter(l=>l==='H').length;
+    document.getElementById('highCount').textContent = highCount;
+    backBtn.style.display = 'none';
+    renderUpazilas(null);
+  }
+
+  renderMap();
+  renderDistrictChips();
+}
+
+function renderAll(){
+  renderNav();
+  renderMain();
+}
+
+function renderLegend(){
+  const legend = document.getElementById('legend');
+  legend.innerHTML = ORDER.map(k=>`
+    <div class="legend-item">
+      <span class="sw" style="background:${LEVELS[k].color}"></span>${LEVELS[k].label}
+    </div>`).join('');
+}
+
+document.getElementById('backToDivision').addEventListener('click', ()=>{
+  activeDistrictId = null;
+  openHazard = null;
+  renderMain();
+});
+
+/* ---------- report generation ---------- */
+function buildReportHTML(entity){
+  const counts = { H:0, M:0, L:0, VL:0 };
+  Object.values(entity.h).forEach(l=>counts[l]++);
+
+  const sorted = [...HAZARDS].sort((a,b)=> ORDER.indexOf(entity.h[a.key]) - ORDER.indexOf(entity.h[b.key]) );
+  const rows = sorted.map(hz=>{
+    const lvl = entity.h[hz.key];
+    const meta = LEVELS[lvl];
+    const note = (lvl==='H'||lvl==='M') ? hz.high : hz.low;
+    return `<tr>
+      <td><strong>${hz.name}</strong><br><span style="color:var(--ink-soft);font-size:11px;">${hz.desc}</span></td>
+      <td class="lvl" style="color:${meta.color}">${meta.label}</td>
+      <td>${note}</td>
+    </tr>`;
+  }).join('');
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+
+  const upazilaBlock = entity.upazilas ? `
+    <div class="rep-section-label">Upazilas (${entity.upazilas.length}) — name &amp; administration line</div>
+    <table class="rep-table" style="margin-top:2px;">
+      <thead><tr><th style="width:45%">Upazila</th><th>Administration line</th></tr></thead>
+      <tbody>${entity.upazilas.map(u=>`<tr><td>${u.n}</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;">${u.u||'—'}</td></tr>`).join('')}</tbody>
+    </table>
+    <p style="font-size:10px;color:var(--ink-soft);font-style:italic;margin-top:8px;">Hazard levels above are modeled at district level and applied uniformly across these upazilas — treat as a starting profile, not a per-upazila measurement.</p>
+  ` : '';
+
+  return `
+    <div class="rep-mast">
+      <div>
+        <div class="eyebrow">Geohazard Briefing · Delta Nation</div>
+        <h2>${entity.title}</h2>
+      </div>
+      <div class="meta">
+        Bangladesh Hazard Atlas<br>
+        Generated ${dateStr}<br>
+        ${entity.subtitle}
+      </div>
+    </div>
+
+    <p class="rep-intro">${entity.tagline}</p>
+
+    <div class="rep-section-label">Risk profile summary</div>
+    <div class="rep-stats">
+      <div><div class="n" style="color:var(--high)">${counts.H}</div><div class="l">High</div></div>
+      <div><div class="n" style="color:var(--med)">${counts.M}</div><div class="l">Medium</div></div>
+      <div><div class="n" style="color:var(--low)">${counts.L}</div><div class="l">Low</div></div>
+      <div><div class="n" style="color:var(--vlow)">${counts.VL}</div><div class="l">Very low</div></div>
+    </div>
+
+    <div class="rep-section-label">Hazard breakdown</div>
+    <table class="rep-table">
+      <thead><tr><th style="width:34%">Hazard</th><th style="width:14%">Level</th><th>Planning note</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    ${upazilaBlock}
+    <div class="rep-foot">
+      This is an illustrative model built on real Bangladesh administrative geography (division, district, and upazila
+      names and district coordinates), with hazard levels estimated from general, well-documented geographic patterns —
+      not an official or measured dataset. Use it as a structural starting point, not a substitute for authoritative
+      hazard data or government planning records.
+    </div>
+  `;
+}
+
+function openReport(){
+  const district = activeDistrictId ? DISTRICTS.find(d=>d.id===activeDistrictId) : null;
+  const div = DIVISIONS.find(d=>d.id===activeId);
+  let entity;
+  if(district){
+    entity = {
+      h: district.h,
+      upazilas: district.upazilas,
+      title: `${district.name} District — Hazard Report`,
+      subtitle: `${div.name} Division`,
+      tagline: `${district.name} District, part of ${div.name} Division. Hazard levels below are modeled from real geographic patterns for this district and carried through to all ${district.upazilas.length} of its upazilas.`
+    };
+  } else {
+    entity = {
+      h: div.h,
+      title: `${div.name} Division — Hazard Report`,
+      subtitle: div.region,
+      tagline: div.tagline
+    };
+  }
+  document.getElementById('reportDoc').innerHTML = buildReportHTML(entity);
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeReport(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+document.getElementById('reportTrigger').addEventListener('click', openReport);
+document.getElementById('btnClose').addEventListener('click', closeReport);
+document.getElementById('modalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'modalOverlay') closeReport();
+});
+document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+document.getElementById('btnDownload').addEventListener('click', ()=>{
+  const district = activeDistrictId ? DISTRICTS.find(d=>d.id===activeDistrictId) : null;
+  const div = DIVISIONS.find(d=>d.id===activeId);
+  const fname = district ? `bangladesh-hazard-report-${div.id}-${district.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.pdf`
+                         : `bangladesh-hazard-report-${div.id}.pdf`;
+  const el = document.getElementById('reportDoc');
+  const btn = document.getElementById('btnDownload');
+  const original = btn.textContent;
+  btn.textContent = 'Building…';
+  html2pdf().set({
+    margin: 0,
+    filename: fname,
+    image: { type:'jpeg', quality:0.98 },
+    html2canvas: { scale:2, backgroundColor:'#FCFAF4' },
+    jsPDF: { unit:'pt', format:'a4', orientation:'portrait' }
+  }).from(el).save().then(()=>{ btn.textContent = original; });
+});
+
+renderAll();
+renderLegend();
+
+/* ---------- email registration gate ---------- */
+document.getElementById('copyYear').textContent = new Date().getFullYear();
+
+const registeredEmails = []; // in-memory only for this page load — see gate-note
+
+document.getElementById('gateForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const input = document.getElementById('gateEmail');
+  const err = document.getElementById('gateError');
+  const email = input.value.trim();
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!valid){
+    err.style.display = 'block';
+    input.focus();
+    return;
+  }
+  err.style.display = 'none';
+  registeredEmails.push(email);
+  document.getElementById('gateOverlay').classList.add('hidden');
+  document.getElementById('appWrap').classList.add('unlocked');
+});
+</script>
+</body>
+</html>
